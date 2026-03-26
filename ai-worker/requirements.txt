@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+paddleocr>=2.7.0
+paddlepaddle>=2.6.0 # Install paddlepaddle-gpu separately if a GPU is available. Defaulting to CPU baseline for setup
+easyocr
+python-multipart
+pandas
+openpyxl
+opencv-python
+requests
+python-dotenv
