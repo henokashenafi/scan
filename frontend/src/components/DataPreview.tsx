@@ -4,6 +4,8 @@ interface StudentRecord {
   math_score: number | null;
   english_score: number | null;
   science_score: number | null;
+  average?: number | null;
+  grade?: string | null;
 }
 
 interface DataPreviewProps {
@@ -28,9 +30,11 @@ export default function DataPreview({ data }: DataPreviewProps) {
           <tr>
             <th className="px-6 py-4">First Name</th>
             <th className="px-6 py-4">Last Name</th>
-            <th className="px-6 py-4">Math Score</th>
-            <th className="px-6 py-4">English Score</th>
-            <th className="px-6 py-4">Science Score</th>
+            <th className="px-6 py-4">Math</th>
+            <th className="px-6 py-4">English</th>
+            <th className="px-6 py-4">Science</th>
+            <th className="px-6 py-4 text-indigo-600">Avg</th>
+            <th className="px-6 py-4 text-indigo-600">Grade</th>
           </tr>
         </thead>
         <tbody>
@@ -38,14 +42,18 @@ export default function DataPreview({ data }: DataPreviewProps) {
             <tr key={idx} className="bg-white border-b hover:bg-neutral-50 last:border-0 border-neutral-100 transition-colors">
               <td className="px-6 py-4 font-medium text-neutral-900">{student.first_name || '-'}</td>
               <td className="px-6 py-4">{student.last_name || '-'}</td>
-              <td className={`px-6 py-4 ${student.math_score === null ? 'text-red-500 bg-red-50/50' : 'text-neutral-700'}`}>
-                {student.math_score !== null ? student.math_score : 'Missing'}
-              </td>
-              <td className={`px-6 py-4 ${student.english_score === null ? 'text-red-500 bg-red-50/50' : 'text-neutral-700'}`}>
-                {student.english_score !== null ? student.english_score : 'Missing'}
-              </td>
-              <td className={`px-6 py-4 ${student.science_score === null ? 'text-red-500 bg-red-50/50' : 'text-neutral-700'}`}>
-                {student.science_score !== null ? student.science_score : 'Missing'}
+              <td className="px-6 py-4">{student.math_score ?? '-'}</td>
+              <td className="px-6 py-4">{student.english_score ?? '-'}</td>
+              <td className="px-6 py-4">{student.science_score ?? '-'}</td>
+              <td className="px-6 py-4 font-bold text-neutral-900">{student.average ?? '-'}</td>
+              <td className="px-6 py-4">
+                <span className={`px-2 py-1 rounded-md text-xs font-bold ${student.grade === 'A' ? 'bg-green-100 text-green-700' :
+                    student.grade === 'B' ? 'bg-blue-100 text-blue-700' :
+                      student.grade === 'C' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                  }`}>
+                  {student.grade || 'N/A'}
+                </span>
               </td>
             </tr>
           ))}
