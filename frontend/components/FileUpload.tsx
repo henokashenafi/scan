@@ -27,35 +27,56 @@ export default function FileUpload({ onUpload, isProcessing }: FileUploadProps) 
     <div
       onDrop={handleDrop}
       onDragOver={(e) => e.preventDefault()}
-      className={`border-2 border-dashed rounded-xl p-12 text-center transition-all ${
+      className={`relative group border-2 border-dashed rounded-2xl p-16 text-center transition-all duration-300 ${
         isProcessing
-          ? 'bg-neutral-100 border-neutral-300 opacity-70 cursor-wait'
-          : 'bg-indigo-50/50 border-indigo-200 hover:bg-indigo-50 cursor-pointer'
+          ? 'bg-slate-100/50 border-slate-300 opacity-80 cursor-wait'
+          : 'glass border-indigo-200 hover:border-indigo-400 cursor-pointer'
       }`}
     >
       <input
         type="file"
         id="fileInput"
         className="hidden"
-        accept="image/*,application/pdf"
+        accept="image/*"
         onChange={handleFileChange}
         disabled={isProcessing}
       />
       
       {isProcessing ? (
-        <div className="flex flex-col items-center space-y-4">
-          <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-lg font-medium text-neutral-600">AI is extracting data...</p>
+        <div className="flex flex-col items-center space-y-6">
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-8 h-8 bg-indigo-600/10 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <p className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600">
+              AI Processing...
+            </p>
+            <p className="text-sm text-slate-500 max-w-xs mx-auto">
+              Our vision models are analyzing your document. This usually takes 5-10 seconds.
+            </p>
+          </div>
         </div>
       ) : (
-        <label htmlFor="fileInput" className="cursor-pointer space-y-4 flex flex-col items-center">
-          <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-2">
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <label htmlFor="fileInput" className="cursor-pointer space-y-6 flex flex-col items-center">
+          <div className="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-2 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-inner">
+            <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
             </svg>
           </div>
-          <h3 className="text-xl font-semibold text-neutral-800">Click or drag a scanned file here</h3>
-          <p className="text-neutral-500">Supports PNG, JPG, JPEG (PDF requires conversion first)</p>
+          <div className="space-y-2">
+            <h3 className="text-2xl font-bold text-slate-800">Drop your file here</h3>
+            <p className="text-slate-500">
+              or <span className="text-indigo-600 font-semibold underline underline-offset-4 decoration-2">browse files</span> from your computer
+            </p>
+          </div>
+          <div className="flex gap-4 text-xs font-medium text-slate-400 pt-4">
+            <span className="px-3 py-1 bg-slate-100 rounded-full">PNG</span>
+            <span className="px-3 py-1 bg-slate-100 rounded-full">JPG</span>
+            <span className="px-3 py-1 bg-slate-100 rounded-full">JPEG</span>
+          </div>
         </label>
       )}
     </div>

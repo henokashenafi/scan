@@ -1,8 +1,7 @@
 const express = require('express');
+const axios = require('axios');
 const router = express.Router();
 const multer = require('multer');
-const FormData = require('form-data');
-const fetch = require('node-fetch'); // Needs to be installed if using older Node. Node 18+ has native fetch.
 
 // Setup Multer for handling file uploads in memory
 const upload = multer({ storage: multer.memoryStorage() });
@@ -15,32 +14,36 @@ router.post('/', upload.single('document'), async (req, res) => {
 
         // Forward the file to the Python AI Worker
         const formData = new FormData();
-        formData.append('file', req.file.buffer, {
-            filename: req.file.originalname,
-            contentType: req.file.mimetype,
-            knownLength: req.file.size
-        });
+        const blob = new Blob([req.file.buffer], { type: req.file.mimetype });
+        formData.append('file', blob, req.file.originalname);
 
-        // The AI Worker runs on port 8000 by default
-        const aiResponse = await fetch('http://localhost:8000/process', {
-            method: 'POST',
-            body: formData,
-            // headers are automatically set by form-data including boundry
-        });
-
-        if (!aiResponse.ok) {
-            console.error('AI Worker error status:', aiResponse.statusText);
-            throw new Error(`AI Worker returned ${aiResponse.status}`);
-        }
-
-        const data = await aiResponse.json();
+        // Using axios for more robust timeout handling
+        console.log(`[${new Date().toISOString()}] Forwarding file to AI Worker: ${req.file.originalname}`);
+        const startTime = Date.now();
         
-        // Return the parsed data to the Next.js frontend
-        res.json({ success: true, data: data });
+        try {
+            const aiResponse = await axios.post('http://127.0.0.1:8001/process', formData, {
+                timeout: 600000, // 10 minutes
+                headers: {
+                    ...formData.getHeaders ? formData.getHeaders() : { 'Content-Type': 'multipart/form-data' }
+                }
+            });
+
+            const duration = (Date.now() - startTime) / 1000;
+            console.log(`[${new Date().toISOString()}] AI Worker responded in ${duration}s`);
+            
+            const data = aiResponse.data;
+            res.json({ success: true, data: data });
+        } catch (error) {
+            const duration = (Date.now() - startTime) / 1000;
+            console.error(`[${new Date().toISOString()}] AI Worker error after ${duration}s:`, error.message);
+            throw error;
+        }
 
     } catch (error) {
         console.error('Upload Error:', error);
-        res.status(500).json({ error: 'Failed to process document', details: error.message });
+        const errorMessage = error.response?.data?.detail || error.message;
+        res.status(500).json({ error: 'Failed to process document', details: errorMessage });
     }
 });
 
