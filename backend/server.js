@@ -2,7 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
+const db = require('./db');
 require('dotenv').config();
+
+// Initialize Database
+db.initDb();
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -18,7 +22,9 @@ app.get('/api/health', (req, res) => {
 
 // Import and use routes
 const uploadRouter = require('./routes/upload');
+const analyticsRouter = require('./routes/analytics');
 app.use('/api/upload', uploadRouter);
+app.use('/api/analytics', analyticsRouter);
 
 // Start server
 app.listen(port, () => {
