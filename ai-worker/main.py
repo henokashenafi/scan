@@ -22,15 +22,9 @@ async def health_check():
 async def process_file(file: UploadFile = File(...)):
     if not file:
         raise HTTPException(status_code=400, detail="No file provided")
-    
     try:
-        # Read file contents into memory
         contents = await file.read()
-        
-        # Process the document using our hybrid OCR pipeline
-        # (Pass the raw bytes to the pipeline)
         result = await process_document(contents, file.filename)
-        
         return result
     except Exception as e:
         import traceback

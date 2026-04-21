@@ -22,7 +22,7 @@ router.post('/', upload.single('document'), async (req, res) => {
         const startTime = Date.now();
         
         try {
-            const aiResponse = await axios.post('http://127.0.0.1:8001/process', formData, {
+            const aiResponse = await axios.post('http://127.0.0.1:8000/process', formData, {
                 timeout: 600000, // 10 minutes
                 headers: {
                     ...formData.getHeaders ? formData.getHeaders() : { 'Content-Type': 'multipart/form-data' }
