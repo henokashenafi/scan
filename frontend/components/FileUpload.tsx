@@ -55,7 +55,7 @@ export default function FileUpload({ onUpload, isProcessing }: FileUploadProps) 
               AI Processing...
             </p>
             <p className="text-sm text-slate-500 max-w-xs mx-auto">
-              Our vision models are analyzing your document. This usually takes 5-10 seconds.
+              Analyzing your document with local OCR. This usually takes 1–5 minutes.
             </p>
           </div>
         </div>

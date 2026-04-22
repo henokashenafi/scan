@@ -16,11 +16,25 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'healthy', message: 'Backend is running' });
 });
 
+const { initSchema } = require('./db');
+
 // Import and use routes
 const uploadRouter = require('./routes/upload');
+const exportRouter = require('./routes/export');
+const recordsRouter = require('./routes/records');
 app.use('/api/upload', uploadRouter);
+app.use('/api/export', exportRouter);
+app.use('/api/records', recordsRouter);
 
-// Start server
-app.listen(port, () => {
-    console.log(`Backend server listening at http://localhost:${port}`);
+// Init DB schema then start server
+initSchema().then(() => {
+    app.listen(port, () => {
+        console.log(`Backend server listening at http://localhost:${port}`);
+    });
+}).catch(err => {
+    console.error('Failed to initialize database:', err.message);
+    console.log('Starting server without database...');
+    app.listen(port, () => {
+        console.log(`Backend server listening at http://localhost:${port}`);
+    });
 });
