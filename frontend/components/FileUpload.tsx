@@ -1,8 +1,9 @@
 import { useCallback } from 'react';
 
 interface FileUploadProps {
-  onUpload: (file: File) => void;
+  onUpload: (files: File[]) => void;
   isProcessing: boolean;
+  progress?: number;
 }
 
 export default function FileUpload({ onUpload, isProcessing }: FileUploadProps) {
@@ -11,7 +12,7 @@ export default function FileUpload({ onUpload, isProcessing }: FileUploadProps) 
       e.preventDefault();
       if (isProcessing) return;
       if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        onUpload(e.dataTransfer.files[0]);
+        onUpload(Array.from(e.dataTransfer.files));
       }
     },
     [onUpload, isProcessing]
@@ -19,7 +20,7 @@ export default function FileUpload({ onUpload, isProcessing }: FileUploadProps) 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      onUpload(e.target.files[0]);
+      onUpload(Array.from(e.target.files));
     }
   };
 
@@ -27,21 +28,21 @@ export default function FileUpload({ onUpload, isProcessing }: FileUploadProps) 
     <div
       onDrop={handleDrop}
       onDragOver={(e) => e.preventDefault()}
-      className={`relative group border-2 border-dashed rounded-2xl p-16 text-center transition-all duration-300 ${
-        isProcessing
+      className={`relative group border-2 border-dashed rounded-2xl p-16 text-center transition-all duration-300 ${isProcessing
           ? 'bg-slate-100/50 border-slate-300 opacity-80 cursor-wait'
           : 'glass border-indigo-200 hover:border-indigo-400 cursor-pointer'
-      }`}
+        }`}
     >
       <input
         type="file"
         id="fileInput"
         className="hidden"
         accept="image/*"
+        multiple
         onChange={handleFileChange}
         disabled={isProcessing}
       />
-      
+
       {isProcessing ? (
         <div className="flex flex-col items-center space-y-6">
           <div className="relative">

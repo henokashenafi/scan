@@ -10,6 +10,9 @@ import numpy as np
 from PIL import Image
 from paddleocr import PaddleOCR
 from llm_mapper import map_text_to_json
+from template_utils import detect_boxes, extract_cell_image
+from digit_recognizer import recognizer
+import cv2
 
 # Initialize OCR Engine (PaddleOCR)
 # Note: Using 'en' for layout support even as we pivot to Vision LLM for Amharic.
@@ -44,9 +47,25 @@ async def process_document(image_bytes: bytes, filename: str) -> dict:
         for line in result[0]:
             text = line[1][0]
             raw_text_parts.append(text)
+    
+    # --- New Template-Specific Extraction (Pillar 1) ---
+    print(f"--- Starting OpenCV Box Extraction for {filename} ---")
+    digit_hints = []
+    try:
+        boxes = detect_boxes(img_np)
+        print(f"Detected {len(boxes)} potential cells.")
+        
+        # Extract "digit hints" from small boxes that might contain handwritten numbers
+        for i, box in enumerate(boxes[:60]): # Process a reasonable subset of cells
+            cell_img = extract_cell_image(img_np, box)
+            digit = recognizer.predict(cell_img)
+            if digit is not None:
+                digit_hints.append(f"Cell_{i}: {digit}")
+    except Exception as e:
+        print(f"OpenCV Box Extraction error: {e}")
          
-    compiled_text = "\n".join(raw_text_parts)
-    print(f"OCR Hint: Extracted {len(compiled_text)} characters.")
+    compiled_text = "\n".join(raw_text_parts + digit_hints)
+    print(f"OCR Hint: Extracted {len(compiled_text)} total characters (including {len(digit_hints)} digit hints).")
 
     # 5. Map semantic meaning using local Vision-LLM
     print(f"--- Starting Vision LLM analysis for {filename} ---")
